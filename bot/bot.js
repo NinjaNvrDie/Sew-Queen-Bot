@@ -18,6 +18,7 @@ const {
 
 const QRCode = require('qrcode');
 const mysql = require('mysql2/promise');
+const pino = require('pino');
 
 require('dotenv').config();
 
@@ -1363,7 +1364,7 @@ async function sendDefaultMenu(
                 ),
 
                 quickReplyButton(
-                    '📞 සහay',
+                    '📞 සහය',
                     'main_support'
                 ),
 
@@ -2161,7 +2162,10 @@ async function startBot() {
                 10000,
 
             markOnlineOnConnect:
-                false
+                false,
+
+            // 🌟 Baileys log spam නවත්තන්න මේක එකතු කළා
+            logger: pino({ level: 'silent' })
         });
 
     // --------------------------------------------------------
