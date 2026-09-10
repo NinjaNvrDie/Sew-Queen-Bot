@@ -1,12 +1,44 @@
-FROM node:18
+FROM ubuntu:latest
 
+# Update and install required packages
+RUN apt-get update && apt-get install -y \
+    jq \
+    git \
+    curl \
+    npm \
+    wget \
+    nodejs \
+    ffmpeg \
+    bpm-tools \
+    python3-pip \
+    python-is-python3 \
+    imagemagick \
+    webp \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install n package manager for managing Node.js versions
+RUN npm install -g n
+
+# Install the latest 18 version of Node.js
+RUN n 18
+
+# Install Yarn package manager (just in case commands need it)
+RUN npm install -g yarn
+
+# Set the working directory
 WORKDIR /app
 
-# bot folder එක ඇතුලේ තියෙන package files copy කරන්න
+# 1. ඔබේ bot folder එකේ package.json එක ගන්න
 COPY bot/package*.json ./
+
+# 2. Packages install කරන්න
 RUN npm install --legacy-peer-deps
 
-# bot folder එකේ ඉතිරි හැම දෙයක්ම copy කරන්න
+# 3. ඔබේ bot folder එකේ ඉතිරි හැම දෙයක්ම copy කරන්න (bot.js ඇතුළු)
 COPY bot/ .
 
-CMD ["node", "bot.js"]
+# 4. sew_queen_src folder එකත් එහෙම්මම copy කරන්න (commands වැඩ කරන්න මේක අනිවාර්යයි)
+COPY sew_queen_src/ ./sew_queen_src/
+
+# 5. ඔබේ බෝට් එක start කරන්න (BloomBot එක නෙවෙයි!)
+CMD [ "node", "bot.js" ]
