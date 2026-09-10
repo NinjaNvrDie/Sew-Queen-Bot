@@ -39,9 +39,9 @@ const COMMANDS_DIR = path.join(
 
 const dbConfig = {
     // ඔබේ Aiven Database විස්තර මෙතනට දාලා තියෙනවා
-    host: process.env.DB_HOST || 'mysql-235e8f4-nisaldiluksha1-a234.j.aivencloud.com',
+    host: process.env.DB_HOST || 'sewqueen-nisaldiluksha1-a234.l.aivencloud.com',
     user: process.env.DB_USER || 'avnadmin',
-    password: process.env.DB_PASSWORD || 'AVNS_M7UlyTqpcRqDC0pTP0U',
+    password: process.env.DB_PASSWORD || 'AVNS_fA4vj19raoW0DSnR02K',
     database: process.env.DB_NAME || 'defaultdb',
     port: process.env.DB_PORT || 19764,
 
@@ -1363,7 +1363,7 @@ async function sendDefaultMenu(
                 ),
 
                 quickReplyButton(
-                    '📞 සහය',
+                    '📞 සහay',
                     'main_support'
                 ),
 
@@ -2491,43 +2491,77 @@ async function main() {
         // ----------------------------------------------------
         // TEST DATABASE
         // ----------------------------------------------------
+        await getDbPool().query('SELECT 1');
 
-        await getDbPool()
-            .query(
-                'SELECT 1'
-            );
+        // ----------------------------------------------------
+        // AUTO CREATE TABLES & INSERT DATA (අලුතින් එකතු කරපු කොටස)
+        // ----------------------------------------------------
+        console.log('⏳ Checking database tables and settings...');
+        const db = getDbPool();
+
+        // Settings table එක හදන්න
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS settings (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                setting_name VARCHAR(255) UNIQUE NOT NULL,
+                setting_value TEXT
+            )
+        `);
+
+        // Bot sessions table එක හදන්න
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS bot_sessions (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                qr_code LONGTEXT,
+                pairing_code VARCHAR(50),
+                requested_phone VARCHAR(50)
+            )
+        `);
+
+        // මුල් සැකසුම් ඇතුළත් කරන්න (ඔබේ අංකය සමඟ)
+        await db.query(`
+            INSERT INTO settings (setting_name, setting_value) 
+            VALUES ('prefix', '.') 
+            ON DUPLICATE KEY UPDATE setting_value='.'
+        `);
+        
+        await db.query(`
+            INSERT INTO settings (setting_name, setting_value) 
+            VALUES ('bot_status', 'online') 
+            ON DUPLICATE KEY UPDATE setting_value='online'
+        `);
+
+        await db.query(`
+            INSERT INTO settings (setting_name, setting_value) 
+            VALUES ('owner_number', '94775663026') 
+            ON DUPLICATE KEY UPDATE setting_value='94775663026'
+        `);
+
+        console.log('✅ Database tables and settings are ready!');
 
         // ----------------------------------------------------
         // ENSURE SESSION
         // ----------------------------------------------------
-
         await ensureBotSessionRow();
 
         // ----------------------------------------------------
         // OFFLINE AT START
         // ----------------------------------------------------
-
-        await updateSetting(
-            'bot_status',
-            'offline'
-        );
+        await updateSetting('bot_status', 'offline');
 
         // ----------------------------------------------------
         // START
         // ----------------------------------------------------
-
         await startBot();
 
     } catch (error) {
 
         console.error(
             '❌ Bot startup error:',
-            error.stack ||
-            error.message
+            error.stack || error.message
         );
 
-        process.exitCode =
-            1;
+        process.exitCode = 1;
     }
 }
 
