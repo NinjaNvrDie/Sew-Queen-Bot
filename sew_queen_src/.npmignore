@@ -1,0 +1,12 @@
+*application
+node_modules
+*.yarnrc.yml
+json.sqlite
+*.pnp.cjs
+*.vscode
+scraper
+*.next
+*.yarn
+*.env
+*.log
+*.db
