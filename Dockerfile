@@ -7,7 +7,6 @@ RUN apt-get update && apt-get install -y \
     curl \
     npm \
     wget \
-    nodejs \
     ffmpeg \
     bpm-tools \
     python3-pip \
@@ -19,8 +18,8 @@ RUN apt-get update && apt-get install -y \
 # Install n package manager for managing Node.js versions
 RUN npm install -g n
 
-# Install the latest 18 version of Node.js
-RUN n 18
+# 🌟 වෙනස: Baileys 7.x සඳහා Node.js 20 අනිවාර්යයි (18 වෙනුවට 20)
+RUN n 20
 
 # Install Yarn package manager (just in case commands need it)
 RUN npm install -g yarn
@@ -40,5 +39,5 @@ COPY bot/ .
 # 4. sew_queen_src folder එකත් එහෙම්මම copy කරන්න (commands වැඩ කරන්න මේක අනිවාර්යයි)
 COPY sew_queen_src/ ./sew_queen_src/
 
-# 5. ඔබේ බෝට් එක start කරන්න (BloomBot එක නෙවෙයි!)
+# 5. ඔබේ බෝට් එක start කරන්න
 CMD [ "node", "bot.js" ]
