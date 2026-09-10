@@ -22,7 +22,7 @@ const mysql = require('mysql2/promise');
 require('dotenv').config();
 
 // ============================================================
-// CONFIG (UPDATED WITH YOUR INFINITYFREE DATABASE DETAILS)
+// CONFIG (UPDATED WITH YOUR AIVEN DATABASE DETAILS)
 // ============================================================
 
 const ROOT_DIR = __dirname;
@@ -38,12 +38,17 @@ const COMMANDS_DIR = path.join(
 );
 
 const dbConfig = {
-    // ඔබේ InfinityFree Database විස්තර මෙතනට දාලා තියෙනවා
-    host: process.env.DB_HOST || 'sql205.infinityfree.com',
-    user: process.env.DB_USER || 'ifo_42871740',
-    password: process.env.DB_PASSWORD || 'NisalDiluksha',
-    database: process.env.DB_NAME || 'ifo_42871740_sew_queen',
-    port: process.env.DB_PORT || 3306,
+    // ඔබේ Aiven Database විස්තර මෙතනට දාලා තියෙනවා
+    host: process.env.DB_HOST || 'mysql-235e8f4-nisaldiluksha1-a234.j.aivencloud.com',
+    user: process.env.DB_USER || 'avnadmin',
+    password: process.env.DB_PASSWORD || 'AVNS_M7UlyTqpcRqDC0pTP0U',
+    database: process.env.DB_NAME || 'defaultdb',
+    port: process.env.DB_PORT || 19764,
+
+    // Aiven වලට connect වෙන්න SSL අනිවාර්යයි
+    ssl: {
+        rejectUnauthorized: false
+    },
 
     waitForConnections: true,
     connectionLimit: Number(process.env.DB_POOL_SIZE || 5),
@@ -2010,8 +2015,7 @@ async function processPairingRequest() {
 
         console.error(
             '❌ Pairing error:',
-            error.stack ||
-            error.message
+            error.stack || error.message
         );
 
         // The request may fail while the socket is still connecting.
