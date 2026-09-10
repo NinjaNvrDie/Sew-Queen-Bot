@@ -41,7 +41,7 @@ const dbConfig = {
     // ඔබේ Aiven Database විස්තර මෙතනට දාලා තියෙනවා
     host: process.env.DB_HOST || 'sewqueen-nisaldiluksha1-a234.l.aivencloud.com',
     user: process.env.DB_USER || 'avnadmin',
-    password: process.env.DB_PASSWORD || 'AVNS_fA4vj19raoW0DSnR02K',
+    password: process.env.DB_PASSWORD || 'AVNS_LJp7EhLBkvNHIh0Lyx6',
     database: process.env.DB_NAME || 'defaultdb',
     port: process.env.DB_PORT || 19764,
 
