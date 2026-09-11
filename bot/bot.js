@@ -6,7 +6,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios'); // HTTP Requests සඳහා අලුතින් එකතු කළා
+const axios = require('axios');
 
 const {
     default: makeWASocket,
@@ -30,12 +30,12 @@ const ROOT_DIR = __dirname;
 const AUTH_DIR = path.join(ROOT_DIR, 'auth_info');
 const COMMANDS_DIR = path.join(ROOT_DIR, 'commands');
 
-// 🌟 ඔබේ වෙබ්සයිට් එකේ URL එක මෙතනට දාන්න
 const WEBSITE_URL = 'https://sewqueen.freedev.app';
 
-// 🌟 InfinityFree Firewall එකට බ්‍රව්සර් එකකින් එනවා වගේ පෙන්නන්න අලුත් Axios Instance එකක්
+// 🌟 InfinityFree Firewall එකට බ්‍රව්සර් එකකින් එනවා වගේ පෙන්නන්න + Timeout එකක් දැම්මා
 const axiosInstance = axios.create({
     baseURL: WEBSITE_URL,
+    timeout: 10000, // තත්පර 10ක් ඇතුළත response නැත්නම් අතහරින්න
     headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'application/json, text/plain, */*',
@@ -71,7 +71,6 @@ const buttonLabelMap = new Map();
 // DATABASE (HTTP API මගින් වෙබ්සයිට් එකට සම්බන්ධ වීම)
 // ============================================================
 
-// Settings කියවීම (වෙබ්සයිට් එකෙන්)
 async function getSetting(settingName, defaultValue = null) {
     try {
         const res = await axiosInstance.get(`/api.php?action=get_setting&name=${settingName}`);
@@ -82,7 +81,6 @@ async function getSetting(settingName, defaultValue = null) {
     }
 }
 
-// Settings ලිවීම (වෙබ්සයිට් එකට)
 async function updateSetting(settingName, settingValue) {
     try {
         await axiosInstance.post('/api.php?action=update_setting', {
@@ -94,7 +92,6 @@ async function updateSetting(settingName, settingValue) {
     }
 }
 
-// QR Code එක Save කිරීම
 async function saveQRCode(base64Data) {
     try {
         await axiosInstance.post('/api.php?action=save_qr', { qr_code: base64Data });
@@ -104,7 +101,6 @@ async function saveQRCode(base64Data) {
     }
 }
 
-// Pairing Code එක Save කිරීම
 async function savePairingCode(code) {
     try {
         await axiosInstance.post('/api.php?action=save_pair', { pairing_code: code });
@@ -114,7 +110,6 @@ async function savePairingCode(code) {
     }
 }
 
-// වෙබ්සයිට් එකෙන් අංකය ලබා ගැනීම
 async function getPendingPhone() {
     try {
         const response = await axiosInstance.get('/api.php?action=get_phone');
@@ -125,13 +120,12 @@ async function getPendingPhone() {
     }
 }
 
-// දත්ත ඉවත් කිරීම (Clear)
 async function clearQRCode() { try { await axiosInstance.post('/api.php?action=clear'); } catch (e) {} }
 async function clearPairingCode() { try { await axiosInstance.post('/api.php?action=clear'); } catch (e) {} }
 async function clearPendingPhone() { try { await axiosInstance.post('/api.php?action=clear'); } catch (e) {} }
 
 // ============================================================
-// COMMAND LOADER (ඔබේ මුල් කෝඩ් එකේ තිබ්බ විදියමයි)
+// COMMAND LOADER
 // ============================================================
 
 function safeRequire(filePath) {
@@ -583,6 +577,8 @@ async function startBot() {
     await stopTimers();
     loadCommands();
 
+    console.log('🤖 Starting WhatsApp connection...');
+
     const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
     authState = state;
 
@@ -675,8 +671,10 @@ async function startBot() {
 async function main() {
     try {
         console.log('⏳ Bot is starting... (Database is handled via Website API)');
-        // Database එකට connect වෙනවා වෙනුවට, වෙබ්සයිට් එකේ api.php එකට ping එකක් යවලා බලමු
-        await axiosInstance.get('/api.php?action=ping').catch(() => console.log('⚠️ Website API is not reachable yet.'));
+        
+        // 🌟 මෙතන වෙනස් කළා: ping එකට await දැම්මේ නැහැ, එතකොට බොට් එක හිර වෙන්නේ නැහැ
+        axiosInstance.get('/api.php?action=ping').catch(() => console.log('⚠️ Website API is not reachable. Continuing bot startup...'));
+        
         await startBot();
     } catch (error) {
         console.error('❌ Bot startup error:', error.stack || error.message);
